@@ -1,0 +1,222 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.test.webcam.client</groupId>
+	<artifactId>webcam-client</artifactId>
+	<version>0.2.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<compile.java.version>1.7</compile.java.version>
+		<file.product.version>0.1.0.0</file.product.version>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:SSS</maven.build.timestamp.format>
+	</properties>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>launch4j-xml-plugin-repo</id>
+			<name>launch4j-xml-plugin Repository for Maven</name>
+			<url>https://launch4j-xml-plugin.googlecode.com/svn/repo</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<!-- 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+				</configuration>
+			</plugin>
+			-->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes</outputDirectory>
+							<includeEmptyDirs>true</includeEmptyDirs>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/java/com/test/customize</directory>
+									<filtering>false</filtering>
+								</resource>
+								<resource>
+									<directory>${basedir}/src/main/java/com/test/resources</directory>
+									<filtering>false</filtering>
+								</resource>
+								<resource>
+									<directory>${basedir}/src/main/java/com/test/xml</directory>
+									<filtering>false</filtering>
+								</resource>
+								<resource>
+									<directory>${basedir}/resources</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<!-- get all project dependencies -->
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<appendAssemblyId>false</appendAssemblyId>
+					<!-- MainClass in mainfest make a executable jar -->
+					<archive>
+						<manifest>
+							<mainClass>org.test.launcher.Launcher</mainClass>
+						</manifest>
+						<manifestEntries>
+							<SplashScreen-Image>resources/camera.png</SplashScreen-Image>
+							<SCM-Revision>${buildNumber}</SCM-Revision>
+							<Project-Version>${project.version}</Project-Version>
+							<Build-Date>${maven.build.timestamp}</Build-Date>
+							<Project-Name>${project.artifactId}_${project.version}</Project-Name>
+						</manifestEntries>
+					</archive>
+
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jarsigner-plugin</artifactId> 
+				<version>1.2</version> <executions> <execution> <id>sign</id> <goals> <goal>sign</goal> 
+				</goals> </execution> </executions> <configuration> <keystore>src/main/resources/jarsigner/keystore/dsct2c.keystore</keystore> 
+				<alias>dsct2c</alias> <storepass>DSCTest2Certificate</storepass> <keypass>DSCTest2Certificate</keypass> 
+				</configuration> </plugin> -->
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>l4j-clui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<!-- <headerType>console</headerType> -->
+							<headerType>gui</headerType>
+							<outfile>target/${project.artifactId}.exe</outfile>
+							<jar>target/${project.artifactId}-${project.version}.jar</jar>
+							<errTitle>${project.artifactId}-${project.version} - Error</errTitle>
+							<icon>resources/camera.ico</icon>
+							<classPath>
+								<mainClass>org.test.launcher.Launcher</mainClass>
+								<addDependencies>true</addDependencies>
+								<preCp>anything</preCp>
+							</classPath>
+							<jre>
+								<minVersion>1.8.0</minVersion>
+								<initialHeapSize>128</initialHeapSize>
+								<maxHeapSize>512</maxHeapSize>
+							</jre>
+							<versionInfo>
+								<fileVersion>1.2.3.4</fileVersion>
+								<txtFileVersion>txt file version?</txtFileVersion>
+								<fileDescription>a description</fileDescription>
+								<copyright>my copyright</copyright>
+								<productVersion>4.3.2.1</productVersion>
+								<txtProductVersion>txt product version</txtProductVersion>
+								<productName>Webcam client</productName>
+								<internalName>webcam-client</internalName>
+								<originalFilename>webcamc.exe</originalFilename>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.sarxos</groupId>
+			<artifactId>webcam-capture</artifactId>
+			<version>0.3.10</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.lingala.zip4j</groupId>
+			<artifactId>zip4j</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+				
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+				
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		
+				
+	</dependencies>
+
+</project>
